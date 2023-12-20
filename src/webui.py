@@ -282,10 +282,7 @@ class EndpointAction(object):
 
     def __call__(self, *args, **kwargs):
         action = self.action(*args, **kwargs)
-        if isinstance(action, wrappers.Response):
-            return action
-        else:
-            return Response(action, status=200, headers={})
+        return action if isinstance(action, wrappers.Response) else Response(action, status=200, headers={})
 
 if __name__ == "__main__":
     from watchdog import Watchdog

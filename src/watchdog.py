@@ -444,10 +444,7 @@ class Watchdog():
                 self.logger.error(f"wigle connection failed: {resp}")
                 return
 
-            if resp["resultCount"] < 1:
-                tower.external_db = ExternalTowers.not_present
-            else:
-                tower.external_db = ExternalTowers.wigle
+            tower.external_db = ExternalTowers.not_present if resp["resultCount"] < 1 else ExternalTowers.wigle
 
         if (not tower.external_db == ExternalTowers.wigle) \
         and self.config.get('general', 'ocid_key'):
@@ -461,10 +458,7 @@ class Watchdog():
                                         tower.cid)
 
             self.logger.info(f"open cell id response {resp}")
-            if 'error' in resp:
-                tower.external_db = ExternalTowers.not_present
-            else:
-                tower.external_db = ExternalTowers.opencellid
+            tower.external_db = ExternalTowers.not_present if 'error' in resp else ExternalTowers.opencellid
 
 
 
@@ -497,10 +491,7 @@ class Watchdog():
         if not self.disable_wigle:
             self.check_wigle(tower)
 
-        if tower.suspiciousness >= 20:
-            tower.classification = TowerClassification.suspicious
-        else:
-            tower.classification = TowerClassification.unknown
+        tower.classification = TowerClassification.suspicious if tower.suspiciousness >= 20 else TowerClassification.unknown
         self.db_session.commit()
 
     def trilaterate_enodeb_location(self, towers, run_checks=True):
